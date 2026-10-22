@@ -2,10 +2,10 @@
 ## Project Introduction
 This is a completely free and open-source system entry hiding tool for Apple devices, built exclusively for Windows. It is clean, stable, no bundled software and no backdoors.
 
-This tool fully supports all devices with A11, A12 and A13 chips. It delivers a reliable and user-friendly system entry hiding solution. Simple operation, one-click execution, 100% success rate, even beginners can operate it easily.
+This tool fully supports all devices with A11, A12 and A13 chips. It delivers a reliable and user-friendly solution. Simple operation, one-click execution, 100% success rate, even beginners can operate it easily.
 
 ## Core Advantages & Features
-- Supports system entry hiding for all A11 / A12 / A13 devices
+- Supports entry hiding for all A11 / A12 / A13 devices
 - Apple ID sign-in works normally after hiding
 - The device can reboot normally, no stuck or boot loop issues
 - Official iOS system upgrade is supported, updates will not be blocked
@@ -16,12 +16,12 @@ This tool fully supports all devices with A11, A12 and A13 chips. It delivers a 
 - Open-source and transparent, all codes can be checked and recompiled for further research
 
 ## Intended Users
-Suitable for Apple device tech enthusiasts, maintenance technicians, researchers and device testers for learning, providing a clean and stable hiding solution.
+Suitable for Apple device tech enthusiasts, maintenance technicians, researchers and device testers for learning, providing a clean and stable entry hiding solution.
 
 ## Simple Instructions
 1. Connect your device to the computer via USB cable
 2. Launch the tool, it will automatically recognize your device
-3. Run system entry hiding with one click
+3. Run entry hiding with one click
 4. After completion, the device returns to normal, all functions are available
 
 ## Disclaimer
