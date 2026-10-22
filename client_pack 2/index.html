@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hide Apple Account</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --win-bg: #e8e8ea;
+      --win-border: #c8cacc;
+      --accent: #007aff;
+      --accent-dark: #0056b3;
+      --btn-idle: #e9ebee;
+      --btn-hover: #dde0e4;
+      --track: #e5e7ea;
+      --progress: #34c759;
+      --danger: #ff3b30;
+      --warn: #ff9500;
+      --text: #1c1c1e;
+      --dim: #6e6e73;
+      --log-bg: #f9f9fb;
+      --mono: "SF Mono", Menlo, Consolas, monospace;
+      --mac-red: #ff5f57;
+      --mac-yellow: #febc2e;
+      --mac-green: #28c840;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+    }
+    body {
+      background: var(--bg);
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .window {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    /* ── macOS 标题栏（红绿灯 + 图标 + 标题）── */
+    .titlebar {
+      height: 28px;
+      flex-shrink: 0;
+      background: linear-gradient(180deg, #e8eaed, #dedfe2);
+      border-bottom: 1px solid var(--win-border);
+      display: flex; align-items: center;
+      padding: 0 12px;
+      position: relative;
+      cursor: default;
+    }
+    .traffic-lights { display: flex; gap: 7px; z-index: 10001; position: relative; }
+    .tl {
+      width: 11px; height: 11px; border-radius: 50%;
+      border: 0.5px solid rgba(0,0,0,0.18);
+      box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.4);
+      cursor: pointer;
+      transition: filter 0.12s ease;
+      -webkit-app-region: no-drag;
+    }
+    .tl:hover { filter: brightness(1.15); }
+    .tl:active { filter: brightness(0.85); }
+    .tl.red    { background: var(--mac-red); }
+    .tl.yellow { background: var(--mac-yellow); }
+    .tl.green  { background: var(--mac-green); }
+    .title-center {
+      position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .title-icon {
+      width: 18px; height: 18px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .title-icon svg { width: 18px; height: 18px; }
+    .title-text {
+      font-size: 13px; font-weight: 600;
+      color: #3a3a3c; white-space: nowrap;
+    }
+    .body {
+      flex: 1; min-height: 0; position: relative;
+      display: flex; flex-direction: column;
+      padding: 10px 16px 0px; gap: 8px;
+      overflow: hidden;
+    }
+    .dev-info {
+      width: 100%; flex-shrink: 0; position: relative;
+      display: flex; flex-direction: column; gap: 0;
+      background: #ffffff;
+      border: 1px solid var(--win-border); border-radius: 10px;
+      padding: 8px 96px 8px 14px;
+      max-height: 220px; overflow-y: scroll;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .dev-info::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    .dev-bigico { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); height: 188px; width: auto; object-fit: contain; pointer-events: none; z-index: 5; }
+    .dev-row {
+      display: grid;
+      grid-template-columns: minmax(80px, auto) 1fr;
+      align-items: center; gap: 4px; padding: 3px 0;
+      border-bottom: 1px dashed #e8eaed;
+    }
+    .dev-row:last-child { border-bottom: none; }
+    .dev-label { font-size: 12px; color: var(--dim); font-weight: 600; text-align: left; }
+    .dev-value { font-family: var(--mono); font-size: 14px; color: #1c1c1e; font-weight: 600; word-break: break-all; display: flex; align-items: center; gap: 8px; }
+    .dev-value .dev-ico { height: 30px; width: auto; object-fit: contain; flex-shrink: 0; }
+    .dev-value .copyable { cursor: pointer; }
+    .dev-value .copyable:hover { color: var(--accent); text-decoration: underline dotted; }
+    .progress-wrap { width: 100%; flex-shrink: 0; margin-top: auto; padding-bottom: 10px; }
+    .progress-top { display: flex; justify-content: flex-end; align-items: baseline; margin-bottom: 6px; }
+    .pct { font-size: 14px; font-weight: 700; color: var(--progress); font-variant-numeric: tabular-nums; }
+    .progress-track {
+      width: 100%; height: 10px;
+      background: var(--track);
+      border-radius: 5px; overflow: hidden;
+      border: 1px solid #d9dce0;
+    }
+    .progress-fill {
+      width: 0%; height: 100%;
+      background: linear-gradient(90deg, #34c759, #30d158);
+      border-radius: 5px;
+      transition: width 0.4s ease;
+    }
+    .actions { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; flex-shrink: 0; padding-top: 2px; }
+    .btn-main {
+      width: 100%;
+      padding: 5px 0;
+      font-size: 13px; font-weight: 600;
+      color: #1c1c1e;
+      background: #e9ebee;
+      border: 1px solid #d0d0d0;
+      border-radius: 7px; cursor: pointer;
+      transition: filter 0.18s ease, transform 0.1s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+    .btn-main:hover:not(:disabled) { filter: brightness(1.08); }
+    .btn-main:active:not(:disabled) { transform: translateY(1px); }
+    .btn-main:disabled { opacity: 0.55; cursor: not-allowed; filter: saturate(0.7); }
+    .msg { position: absolute; left: 0; right: 0; top: 100%; margin-top: 2px; width: 100%; font-size: 11px; line-height: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; display: none; color: var(--danger); box-sizing: border-box; z-index: 50; }
+    .msg.show { display: block; }
+    .msg.ok { color: var(--progress); }
+    .msg.warn { color: var(--warn); }
+
+    /* ── 状态弹窗（白底浅阴影）── */
+    .license-overlay {
+      position: fixed; inset: 0; z-index: 999;
+      display: none;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.25);
+      backdrop-filter: blur(2px);
+    }
+    .license-overlay.show { display: flex; }
+    .license-card {
+      width: min(300px, 82%);
+      background: #ffffff;
+      border: 1px solid var(--win-border);
+      border-radius: 12px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.22);
+      text-align: center;
+    }
+    .license-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+    .license-sub { font-size: 11px; color: var(--dim); margin-bottom: 12px; line-height: 1.55; white-space: pre-line; }
+    .license-btn {
+      width: 100%; margin-top: 8px;
+      padding: 9px;
+      font-size: 13px; font-weight: 700;
+      color: #fff;
+      background: linear-gradient(180deg, var(--accent), var(--accent-dark));
+      border: none; border-radius: 7px;
+      cursor: pointer;
+      transition: filter 0.15s ease;
+    }
+    .license-btn:hover { filter: brightness(1.08); }
+  </style>
+</head>
+<body>
+  <div class="window">
+    <!-- macOS 标题栏 -->
+    <div class="titlebar" id="titlebar">
+      <div class="traffic-lights">
+        <div class="tl red" id="tlRed"></div>
+        <div class="tl yellow" id="tlYellow"></div>
+        <div class="tl green" id="tlGreen"></div>
+      </div>
+      <div class="title-center">
+        <div class="title-text">Hide Apple Account</div>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="dev-info" id="devInfo">
+        <div class="dev-row"><div class="dev-label">设备型号</div><div class="dev-value">—</div></div>
+        <div class="dev-row"><div class="dev-label">序列号</div><div class="dev-value">—</div></div>
+        <div class="dev-row"><div class="dev-label">产品类型</div><div class="dev-value">—</div></div>
+        <div class="dev-row"><div class="dev-label">系统版本</div><div class="dev-value">—</div></div>
+        <div class="dev-row"><div class="dev-label">销售地区</div><div class="dev-value">—</div></div>
+        <div class="dev-row"><div class="dev-label">激活状态</div><div class="dev-value">—</div></div>
+        <div class="dev-row"><div class="dev-label">ECID</div><div class="dev-value">—</div></div>
+        <div class="dev-row"><div class="dev-label">UDID</div><div class="dev-value">—</div></div>
+      </div>
+      <div class="actions">
+        <button class="btn-main" id="startBtn">Start Operation</button>
+        <div class="msg" id="msg"></div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-top"><span class="pct" id="progressPct">0%</span></div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 状态提示（点Start：未连接 / 未注册 时弹出） -->
+  <div class="license-overlay" id="licenseOverlay">
+    <div class="license-card">
+      <div class="license-title" id="licenseTitle">设备未注册</div>
+      <div class="license-sub" id="licenseSub">请联系管理员，在授权网站完成注册后，再回到软件点击该按钮</div>
+      <button class="license-btn" id="licenseClose">好的</button>
+    </div>
+  </div>
+
+  <!-- 任务结果弹窗 -->
+  <div class="license-overlay" id="resultOverlay">
+    <div class="license-card">
+      <div class="license-title" id="resultTitle">任务完成</div>
+      <div class="license-sub" id="resultSub">操作已成功执行，请退出“设置”后重新打开使其生效。</div>
+      <button class="license-btn" id="resultCloseBtn">好的</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+      var btn = document.getElementById("startBtn");
+      var fill = document.getElementById("progressFill");
+      var pctEl = document.getElementById("progressPct");
+      var devInfo = document.getElementById("devInfo");
+      var msg = document.getElementById("msg");
+      var deviceConnected = false;
+      var taskRunning = false;
+
+      // ── 状态提示弹窗 ──
+      var licenseOverlay = document.getElementById("licenseOverlay");
+      var licenseClose = document.getElementById("licenseClose");
+      var licenseTitle = document.getElementById("licenseTitle");
+      var licenseSub = document.getElementById("licenseSub");
+      licenseClose.addEventListener("click", function () {
+        licenseOverlay.classList.remove("show");
+      });
+
+      // ── 任务结果弹窗 ──
+      var resultOverlay = document.getElementById("resultOverlay");
+      var resultTitle = document.getElementById("resultTitle");
+      var resultSub = document.getElementById("resultSub");
+      document.getElementById("resultCloseBtn").addEventListener("click", function () {
+        resultOverlay.classList.remove("show");
+      });
+      function showResultModal(title, sub) {
+        resultTitle.textContent = title;
+        resultSub.textContent = sub;
+        resultOverlay.classList.add("show");
+      }
+
+      // 根据 ProductType 返回对应正面机型图
+      function deviceImg(productType) {
+        var pt = (productType || "").toLowerCase();
+        if (!pt) return "";
+
+        // ── iPad ──
+        var ipadM = pt.match(/^ipad[\s,]*(\d+)[,.](\d+)$/);
+        if (ipadM) {
+          var mj = parseInt(ipadM[1], 10);
+          var mn = parseInt(ipadM[2], 10);
+          // iPad mini with Home: mini1=2,x / mini2-5 = 4,x 5,x 7,x / 11,x(mini6)无Home
+          if (mj === 11 && mn === 16) return "device_imgs/ipad_modern.png"; // iPad mini 6
+          if (mj === 14 && mn >= 1 && mn <= 2) return "device_imgs/ipad_modern.png"; // iPad mini 7
+          if (mj === 2) return "device_imgs/ipad_home.png"; // iPad 2 / mini 1
+          if (mj === 4) return "device_imgs/ipad_home.png"; // iPad Air 1 / mini 2-3
+          if (mj === 5 && mn <= 4) return "device_imgs/ipad_home.png"; // iPad Air 2-3 / mini 4-5
+          if (mj === 6) return "device_imgs/ipad_home.png"; // iPad 5-7 / iPad Pro 9.7 1st / Pro 12.9 1st-2nd
+          if (mj === 7 && mn <= 12) return "device_imgs/ipad_home.png"; // iPad 7-8 / iPad Pro 10.5 / Pro 12.9 2nd
+          // iPad Pro / Air / mini 无Home键
+          if (mj >= 8) return "device_imgs/ipad_modern.png";
+          return "device_imgs/ipad_home.png";
+        }
+
+        // ── iPhone ──
+        // 特例：数字命名较大但实为带 Home 键的 SE 机型
+        if (pt === "iphone12,8" || pt === "iphone14,6" || pt === "iphone 12.8" || pt === "iphone 14.6") {
+          return "device_imgs/iphone_home.png";
+        }
+        // 支持 "iphone13,2" 和 "iphone 13.2" 两种格式
+        var m = pt.match(/^iphone[\s,]*(\d+)[,.](\d+)$/);
+        if (m) {
+          var major = parseInt(m[1], 10);
+          var minor = parseInt(m[2], 10);
+          // 灵动岛：15代里的 2/3/4/5，及 16 代及以上
+          if (major >= 16) return "device_imgs/iphone_dynamicisland.png";
+          if (major === 15 && minor >= 2) return "device_imgs/iphone_dynamicisland.png";
+          // 带 Home 键：8 代及更早
+          if (major <= 8) return "device_imgs/iphone_home.png";
+          // 其余 9~14 代 = 刘海
+          return "device_imgs/iphone_notch.png";
+        }
+
+        // 兜底：无法识别时返回刘海 iPhone
+        return "device_imgs/iphone_notch.png";
+      }
+
+      function renderRows(rows) {
+        devInfo.innerHTML = "";
+        // 先取出 设备型号 用于匹配机型图（格式如 "iPhone 18.1" 或原始 "iPhone18,1"）
+        var productType = "";
+        rows.forEach(function (r) {
+          if (r.label === "设备型号") productType = r.value;
+        });
+        var imgSrc = deviceImg(productType);
+        rows.forEach(function (r) {
+          var row = document.createElement("div");
+          row.className = "dev-row";
+          var lab = document.createElement("div");
+          lab.className = "dev-label";
+          lab.textContent = r.label;
+          var val = document.createElement("div");
+          val.className = "dev-value";
+          var span = document.createElement("span");
+          span.textContent = r.value;
+          // UDID 行：点击复制，提示区反馈
+          if (r.label === "UDID" && r.value && r.value !== "—") {
+            span.classList.add("copyable");
+            span.title = "点击复制";
+            span.addEventListener("click", function () {
+              copyText(span.textContent);
+            });
+          }
+          val.appendChild(span);
+          row.appendChild(lab); row.appendChild(val);
+          devInfo.appendChild(row);
+        });
+        // 机型大图：放信息卡片右侧空白处
+        if (imgSrc) {
+          var big = document.createElement("img");
+          big.className = "dev-bigico";
+          big.src = imgSrc;
+          big.alt = "";
+          devInfo.appendChild(big);
+        }
+      }
+      var PLACEHOLDER_LABELS = ["设备型号","序列号","产品类型","系统版本","销售地区","激活状态","ECID","UDID"];
+      function clearRows() {
+        devInfo.innerHTML = "";
+        PLACEHOLDER_LABELS.forEach(function (lab) {
+          var row = document.createElement("div");
+          row.className = "dev-row";
+          var l = document.createElement("div");
+          l.className = "dev-label";
+          l.textContent = lab;
+          var v = document.createElement("div");
+          v.className = "dev-value";
+          v.textContent = "—";
+          row.appendChild(l); row.appendChild(v);
+          devInfo.appendChild(row);
+        });
+      }
+      function showMsg(text, type) {
+        if (text) {
+          msg.textContent = text;
+          msg.className = "msg show" + (type === "ok" ? " ok" : type === "warn" ? " warn" : "");
+        } else {
+          msg.textContent = "";
+          msg.className = "msg";
+        }
+      }
+
+      // 复制到剪贴板（clipboard API + execCommand 兜底），成功在提示区反馈
+      function copyText(t) {
+        function done() {
+          showMsg("已粘贴", "ok");
+          clearTimeout(copyText._t);
+          copyText._t = setTimeout(function () { showMsg(""); }, 1600);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(t).then(done).catch(function () { fallback(); });
+        } else { fallback(); }
+        function fallback() {
+          try {
+            var ta = document.createElement("textarea");
+            ta.value = t;
+            ta.style.position = "fixed"; ta.style.opacity = "0";
+            document.body.appendChild(ta); ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+            done();
+          } catch (e) {
+            showMsg("复制失败，请手动选择", "warn");
+          }
+        }
+      }
+
+      function setBusy(on) {
+        taskRunning = on;
+        btn.disabled = on;
+        btn.textContent = on ? "Running..." : "Start Operation";
+        deviceConnected = on || deviceConnected;
+      }
+      var _lastPct = 0;
+      function setValue(v) {
+        var p = Math.max(0, Math.min(100, Math.round(v)));
+        // 进度只进不退：任务进行中若收到更小的回退值（旧线程/抖动），忽略。
+        // 归零（新一轮）由 resetProgress 显式处理。
+        if (taskRunning && p < _lastPct) p = _lastPct;
+        _lastPct = p;
+        fill.style.width = p + "%";
+        pctEl.textContent = p + "%";
+      }
+      function resetProgress(v) {
+        _lastPct = 0;
+        setValue(v);
+      }
+
+      // 前端不再渲染日志；保留接口占位，避免后端调用报错
+      function appendLog() {}
+      function appendLogBatch() {}
+
+      window.addLog = function (line, type) { appendLog(line, type); };
+      window.addLogs = function (lines) { if (lines && lines.length) appendLogBatch(lines); };
+      window.setProgress = function (v) { setValue(v); };
+      window.setResult = function (text, ok) {
+        showMsg(text, ok ? "ok" : "error");
+        setBusy(false);
+      };
+      window.abortTask = function () {
+        setBusy(false);
+        showMsg("Aborted — device disconnected", "warn");
+      };
+
+      // ── 红绿灯绑定 + 拖动兼容 ──
+      var tlRed = document.getElementById("tlRed");
+      var tlYellow = document.getElementById("tlYellow");
+      var tlGreen = document.getElementById("tlGreen");
+      var trafficLights = [tlRed, tlYellow, tlGreen];
+
+      // 红绿灯 mousedown 阻止冒泡，防止触发拖动
+      trafficLights.forEach(function(el) {
+        el.addEventListener("mousedown", function(e) {
+          e.stopPropagation();
+        });
+        el.addEventListener("click", function(e) {
+          e.stopPropagation();
+        });
+      });
+
+      // 标题栏拖动：JS mousemove + Python SetWindowPos
+      var titlebar = document.getElementById("titlebar");
+      var _dragging = false, _dragStartMX = 0, _dragStartMY = 0, _dragStartWX = 0, _dragStartWY = 0;
+      var _lastMoveTime = 0;
+
+      titlebar.addEventListener("mousedown", function(e) {
+        if (e.target.classList.contains("tl")) return;
+        _dragging = true;
+        _dragStartMX = e.screenX;
+        _dragStartMY = e.screenY;
+        _dragStartWX = window.screenX;
+        _dragStartWY = window.screenY;
+        e.preventDefault();
+      });
+      document.addEventListener("mousemove", function(e) {
+        if (!_dragging) return;
+        var now = Date.now();
+        if (now - _lastMoveTime < 16) return;  // 节流 ~60fps
+        _lastMoveTime = now;
+        var newX = _dragStartWX + (e.screenX - _dragStartMX);
+        var newY = _dragStartWY + (e.screenY - _dragStartMY);
+        if (window.pywebview && window.pywebview.api && window.pywebview.api.move_window) {
+          window.pywebview.api.move_window(newX, newY);
+        }
+      });
+      document.addEventListener("mouseup", function() {
+        _dragging = false;
+      });
+
+      tlRed.addEventListener("click", function () {
+        if (window.pywebview && window.pywebview.api && window.pywebview.api.close_window) {
+          window.pywebview.api.close_window();
+        }
+      });
+      tlYellow.addEventListener("click", function () {
+        if (window.pywebview && window.pywebview.api && window.pywebview.api.minimize_window) {
+          window.pywebview.api.minimize_window();
+        }
+      });
+      tlGreen.addEventListener("click", function () {
+        if (window.pywebview && window.pywebview.api && window.pywebview.api.maximize_window) {
+          window.pywebview.api.maximize_window();
+        }
+      });
+
+      // 点击立即进入“处理中”：禁用按钮并给出视觉反馈，避免用户以为没反应
+      // 而再次点击（重复点击会启动两个攻击线程，导致进度条互踩、最终停在95）。
+      var _starting = false;
+      btn.addEventListener("click", function () {
+        if (btn.disabled || _starting) return;
+        if (!window.pywebview || !window.pywebview.api) return;
+        _starting = true;
+        btn.disabled = true;
+        btn.textContent = "Checking...";
+        window.pywebview.api.start_attack().then(function (r) {
+          _starting = false;
+          if (r && r.ok) {
+            setBusy(true);
+            resetProgress(0);
+            showMsg("");
+          } else {
+            var err = (r && r.error) != null ? String(r.error) : "";
+            var hasUdid = !!(r && r.udid);
+            if (!hasUdid || err.indexOf("未检测到设备") !== -1) {
+              licenseTitle.textContent = "未连接设备";
+              licenseSub.textContent = "请用数据线连接手机，解锁屏幕并点击“信任此电脑”后再试";
+            } else {
+              licenseTitle.textContent = "设备未注册";
+              licenseSub.textContent = "请联系管理员，在授权网站完成注册后，再回到软件点击该按钮";
+            }
+            licenseOverlay.classList.add("show");
+            setBusy(false);
+          }
+        }).catch(function (e) {
+          _starting = false;
+          licenseTitle.textContent = "出错了";
+          licenseSub.textContent = String(e);
+          licenseOverlay.classList.add("show");
+          setBusy(false);
+        });
+      });
+
+      // ── 轮询更新 ──
+      var _pollTimer = null;
+      var IDLE_INTERVAL = 1000;
+      var ACTIVE_INTERVAL = 200;
+
+      function pollUpdates() {
+        if (!window.pywebview || !window.pywebview.api) {
+          _pollTimer = setTimeout(pollUpdates, IDLE_INTERVAL);
+          return;
+        }
+        window.pywebview.api.get_updates().then(function (upd) {
+          var hasActivity = false;
+          if (!upd) { _pollTimer = setTimeout(pollUpdates, IDLE_INTERVAL); return; }
+
+          // 日志：后端仍返回，但前端不再渲染（接口保留避免报错）
+          if (upd.logs && upd.logs.length) { hasActivity = true; }
+
+          // 轮询不再处理 license
+
+          if (upd.driver) {
+            var dprob = upd.driver.problem || "设备驱动异常";
+            var dsug = upd.driver.suggestion ? ("（" + upd.driver.suggestion + "）") : "";
+            showMsg(dprob + dsug, "warn");
+            hasActivity = true;
+          }
+
+          if (upd.trust) {
+            showMsg("请解锁手机并点击“信任此电脑”", "warn");
+            hasActivity = true;
+          }
+
+          if (typeof upd.progress === "number") { setValue(upd.progress); hasActivity = true; }
+
+          if (upd.device) {
+            if (upd.device.success) {
+              renderRows(upd.device.data || []);
+              showMsg("");
+              deviceConnected = true;
+            } else {
+              clearRows();
+              if (upd.device.needs_trust) {
+                showMsg("未连接设备", "warn");
+              } else if (upd.device.error) {
+                showMsg(upd.device.error, "warn");
+              } else {
+                showMsg("未检测到设备", "warn");
+              }
+              deviceConnected = false;
+            }
+            hasActivity = true;
+          }
+
+          if (upd.result !== undefined && upd.result !== null) {
+            var r = upd.result;
+            var rOk = (r === true) || (r && r.ok === true);
+            var rText = (r && typeof r.text === "string") ? r.text : "";
+            if (!rOk) {
+              showResultModal("任务失败",
+                rText || "操作未能完成，请检查设备连接与配对后重试。");
+            } else {
+              setValue(100);
+              showResultModal("任务完成",
+                rText || "隐藏成功.请刷新设置或重启手机");
+            }
+            showMsg("");
+            setBusy(false);
+            hasActivity = true;
+          }
+
+          _pollTimer = setTimeout(pollUpdates, hasActivity ? ACTIVE_INTERVAL : IDLE_INTERVAL);
+        }).catch(function () {
+          _pollTimer = setTimeout(pollUpdates, IDLE_INTERVAL);
+        });
+      }
+      _pollTimer = setTimeout(pollUpdates, IDLE_INTERVAL);
+    })();
+  </script>
+</body>
+</html>
