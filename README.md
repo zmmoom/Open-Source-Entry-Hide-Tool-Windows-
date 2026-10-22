@@ -4,7 +4,7 @@ Project Introduction
 
 This is a completely free and open-source enter-system hide tool for Apple devices, built exclusively for Windows. It is clean, stable, with no bundled software and no backdoors.
 
-This tool fully supports all devices with A11, A12 and A13 chips. It delivers a reliable and user-friendly enter-system hide solution. Simple operation, one-click execution, 100% success rate, even beginners can operate it easily.
+This tool fully supportschips. It delivers a reliable and user-friendly enter-system hide solution. Simple operation, one-click execution, 100% success rate, even beginners can operate it easily.
 
 Core Advantages & Features
 
