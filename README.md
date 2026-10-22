@@ -1,11 +1,11 @@
-# Open-source System Entry Hide Tool (Windows Version)
+# Open-source In-System Hide Tool (Windows Version)
 ## Project Introduction
-This is a completely free and open-source system entry hide tool for Apple devices, built exclusively for Windows. It is clean, stable, no bundled software and no backdoors.
+This is a completely free and open-source in-system hide tool for Apple devices, built exclusively for Windows. It is clean, stable, no bundled software and no backdoors.
 
-This tool fully supports all devices with A11, A12 and A13 chips. It delivers a reliable and user-friendly system entry hide solution. Simple operation, one-click execution, 100% success rate, even beginners can operate it easily.
+This tool fully supports all devices with A11, A12 and A13 chips. It delivers a reliable and user-friendly in-system hide solution. Simple operation, one-click execution, 100% success rate, even beginners can operate it easily.
 
 ## Core Advantages & Features
-- Supports system entry hide for all A11 / A12 / A13 devices
+- Supports in-system hide for all A11 / A12 / A13 devices
 - Apple ID sign-in works normally after hiding
 - The device can reboot normally, no stuck or boot loop issues
 - Official iOS system upgrade is supported, updates will not be blocked
@@ -16,12 +16,12 @@ This tool fully supports all devices with A11, A12 and A13 chips. It delivers a 
 - Open-source and transparent, all codes can be checked and recompiled for further research
 
 ## Intended Users
-Suitable for Apple device tech enthusiasts, maintenance technicians, researchers and device testers for learning, providing a clean and stable system entry hide solution.
+Suitable for Apple device tech enthusiasts, maintenance technicians, researchers and device testers for learning, providing a clean and stable in-system hide solution.
 
 ## Simple Instructions
 1. Connect your device to the computer via USB cable
 2. Launch the tool, it will automatically recognize your device
-3. Run system entry hide with one click
+3. Run in-system hide with one click
 4. After completion, the device returns to normal, all functions are available
 
 ## Disclaimer
