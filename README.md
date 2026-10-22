@@ -1,5 +1,3 @@
-以下是完整英文版原文：
-
 Open-source In-System Hide Tool (Windows Version)
 
 Project Introduction
@@ -44,3 +42,5 @@ Contact
 
 For updates, technical support and feedback:
 Telegram: https://t.me/apple_hide_tool
+
+---
