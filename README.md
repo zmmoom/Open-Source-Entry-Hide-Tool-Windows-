@@ -8,7 +8,7 @@ This tool fully supports all devices with A11, A12 and A13 chips. It delivers a 
 
 Core Advantages & Features
 
-· Supports enter-system hide for all A11 / A12 / A13 devices
+· Supports enter-system hide for  devices
 · Apple ID sign-in works normally after hiding
 · The device can reboot normally, with no stuck or boot loop issues
 · Official iOS system upgrade is supported, and updates will not be blocked
