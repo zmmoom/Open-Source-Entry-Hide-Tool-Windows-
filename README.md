@@ -1,33 +1,33 @@
-Open-source In-System Hide Tool (Windows Version)
+Open-source Enter-System Hide Tool (Windows Version)
 
 Project Introduction
 
-This is a completely free and open-source in-system hide tool for Apple devices, built exclusively for Windows. It is clean, stable, no bundled software and no backdoors.
+This is a completely free and open-source enter-system hide tool for Apple devices, built exclusively for Windows. It is clean, stable, with no bundled software and no backdoors.
 
-This tool fully supports all devices with A11, A12 and A13 chips. It delivers a reliable and user-friendly in-system hide solution. Simple operation, one-click execution, 100% success rate, even beginners can operate it easily.
+This tool fully supports all devices with A11, A12 and A13 chips. It delivers a reliable and user-friendly enter-system hide solution. Simple operation, one-click execution, 100% success rate, even beginners can operate it easily.
 
 Core Advantages & Features
 
-· Supports in-system hide for all A11 / A12 / A13 devices
+· Supports enter-system hide for all A11 / A12 / A13 devices
 · Apple ID sign-in works normally after hiding
-· The device can reboot normally, no stuck or boot loop issues
-· Official iOS system upgrade is supported, updates will not be blocked
+· The device can reboot normally, with no stuck or boot loop issues
+· Official iOS system upgrade is supported, and updates will not be blocked
 · ✅ No data erasure, all your data will be kept intact
 · Compatible with most iOS versions, works for both old and new firmware
 · Lightweight program, fast startup, no ads and no paid features
 · All operations run locally, no data upload, protecting your privacy
-· Open-source and transparent, all codes can be checked and recompiled for further research
+· Open-source and transparent, all code can be checked and recompiled for further research
 
 Intended Users
 
-Suitable for Apple device tech enthusiasts, maintenance technicians, researchers and device testers for learning, providing a clean and stable in-system hide solution.
+Suitable for Apple device tech enthusiasts, maintenance technicians, researchers and device testers for learning, providing a clean and stable enter-system hide solution.
 
 Simple Instructions
 
 1. Connect your device to the computer via USB cable
-2. Launch the tool, it will automatically recognize your device
-3. Run in-system hide with one click
-4. After completion, the device returns to normal, all functions are available
+2. Launch the tool, and it will automatically recognize your device
+3. Run enter-system hide with one click
+4. After completion, the device returns to normal, and all functions are available
 
 Disclaimer
 
@@ -42,5 +42,3 @@ Contact
 
 For updates, technical support and feedback:
 Telegram: https://t.me/apple_hide_tool
-
----
