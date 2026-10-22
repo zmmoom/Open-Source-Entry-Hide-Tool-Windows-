@@ -42,3 +42,5 @@ Contact
 
 For updates, technical support and feedback:
 Telegram: https://t.me/apple_hide_tool
+
+---
